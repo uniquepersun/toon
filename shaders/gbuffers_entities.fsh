@@ -17,6 +17,7 @@ void main() {
 	color = texture(gtexture, texcoord) * glcolor;
 	color.rgb = mix(color.rgb, entityColor.rgb, entityColor.a);
 	color *= texture(lightmap, lmcoord);
+	color.g = 1.0;
 	if (color.a < alphaTestRef) {
 		discard;
 	}
