@@ -1,8 +1,12 @@
 #version 330 compatibility
 
+#include "/lib/settings.glsl"
+#include "/lib/crayon.glsl"
+
 uniform int renderStage;
 uniform float viewHeight;
 uniform float viewWidth;
+uniform float frameTimeCounter;
 uniform mat4 gbufferModelView;
 uniform mat4 gbufferProjectionInverse;
 uniform vec3 fogColor;
@@ -16,7 +20,9 @@ float fogify(float x, float w) {
 
 vec3 calcSkyColor(vec3 pos) {
 	float upDot = dot(pos, gbufferModelView[1].xyz); //not much, what's up with you?
-	return mix(skyColor, fogColor, fogify(max(upDot, 0.0), 0.25));
+	vec2 p = drawingCoord(gl_FragCoord.xy, viewHeight);
+	float jitter = (valueNoise(p * 0.12 + boilOffset(frameTimeCounter)) - 0.5) * 0.4;
+	return mix(skyColor, fogColor, roughBand(fogify(max(upDot, 0.0), 0.25), LIGHT_BANDS + 1.0, jitter));
 }
 
 vec3 screenToView(vec3 screenPos) {
